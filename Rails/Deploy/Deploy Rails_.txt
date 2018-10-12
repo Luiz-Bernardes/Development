@@ -1,0 +1,213 @@
+---------------- Servidor de Produção ------------------------
+
+
+[Ruby e Rails]
+Link: https://gorails.com/setup/ubuntu/15.10
+
+[Instalação do RUBY]
+sudo apt-get update
+sudo apt-get install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev nodejs
+
+cd
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+exec $SHELL
+
+git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+exec $SHELL
+
+rbenv install 2.2.2
+rbenv global 2.2.2
+ruby -v
+
+gem install bundler
+
+PS.: Se ao rodar o bundle, der erro "Erro The `bundle' command exists in these Ruby versions" desinstalar e instalar novamente:
+gem uninstall bundler
+
+
+[Instalação do RAILS]
+
+curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+gem install rails -v 5.0.1
+rbenv rehash
+rails -v
+
+
+[Configuração do Nginx pelo Passeger]
+Link: https://github.com/Brunomm/tutoriais/tree/master/NGINX-com-passenger
+
+sudo apt-get update
+Instalar dependências: sudo apt-get install libcurl4-openssl-dev
+
+Instalar gem passsenger: gem install passenger
+Mudar dono da pasta: sudo chown -R 'tocanet' /opt
+Instalar o NGINX pelo Passenger: passenger-install-nginx-module --auto-download --auto
+Mudar dono da pasta: sudo chown -R root /opt
+
+Configurar o NGINX iniciar automaticamente:
+wget -O init-deb.sh https://www.linode.com/docs/assets/660-init-deb.sh
+sudo mv init-deb.sh /etc/init.d/nginx
+sudo chmod +x /etc/init.d/nginx
+sudo /usr/sbin/update-rc.d -f nginx defaults
+
+
+<!-- Se der erro perl: "warning: Setting locale failed." Utilizar comando: sudo locale-gen pt_BR.UTF-8 -->
+    
+Atualizar arquivo de configuração no Nginx: /opt/nginx/conf/nginx.conf
+    server {
+        listen       80;
+        server_name  localhost;
+        passenger_enabled on;  (habilitar o passenger)
+        rails_env    production; (colocar o rails em produção)
+        
+        location / {
+        	root /opt/nginx/html/vertv/current/public; (local da aplicação)
+        }
+    }
+    
+    
+[Instação do Postgres]
+
+Configurar banco Postgres:
+sudo apt-get install synaptic
+sudo apt-get update
+sudo apt-get install postgresql postgresql-contrib
+
+sudo passwd postgres (criar a senha)
+su postgres
+psql 
+CREATE USER postgres SUPERUSER INHERIT CREATEDB CREATEROLE;
+ALTER USER postgres PASSWORD 'postgres'; 
+CREATE DATABASE nomedobanco;
+
+Sair do prompt: \q
+Sair do usuário postgres: exit
+
+sudo /etc/init.d/postgresql restart
+
+
+--------------- Servidor de desenvolvimento ----------------------
+
+
+[Instalação do Gitlab]
+
+Gerar chave ssh para emparelhar com gitlab:
+Gerar: ssh-keygen -t rsa -C "your.email@example.com" -b 4096
+Copiar: xclip -sel clip < ~/.ssh/id_rsa.pub
+Colar chave no gitlab para autorizar login.
+Validar conexão: ssh -T git@gitlab.com
+PS.: Caso não funcione a chave deverá ser criada com um nome diferente do arquivo original (id_rsa.pub).
+
+
+[Configuração do Capistrano]
+
+Link: https://imasters.com.br/artigo/22977/ruby-on-rails/deploy-de-aplicacoes-rails-com-capistrano/?trace=1519021197&source=single
+
+Instalação: 
+gem install capistrano
+
+Ou adicione-o no Gemfile
+group :development
+    gem 'capistrano'
+end
+
+Capificação:
+Nesse processo a aplicação se tornará gerenciável pelo capistrano.
+
+cd my_app
+capify .
+
+--> Esses comandos criação o Capfile e o /config/deploy.rb.
+
+
+Configuração do deploy.rb:
+
+require "capistrano/scm/git"
+# config valid only for current version of Capistrano
+lock "3.9.1"
+
+set :application, "osj"
+set :repo_url, "git@gitlab.com:tocanet/osj.git"
+
+set :user, "tocanet"
+set :use_sudo, false
+
+role :app, "tocanet@192.168.25.3:22"
+role :web, "tocanet@192.168.25.3:22"
+role :db, "tocanet@192.168.25.3:22", :primary => true
+
+set :deploy_to, "/opt/nginx/html/osj"
+
+set :stages, ["production"]
+
+
+Banco de dados:
+
+No Gemfile:
+ group :production do
+   gem 'pg', '~> 0.18'
+ end
+ 
+No /config/database.yml:
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: 
+  pool: 5
+  host: localhost  
+  username: user
+  password: 'pass'
+  
+No /config/secrets.yml:
+Comando: rake secret
+Copiar a senha em config/secrets.yml:
+production:
+  secret_key_base: "<key gerada>"
+  
+Deploy:
+Após a configuração de todos os passos, rodar o seguinte comando na pasta do projeto: cap production deploy
+
+
+---------------- Servidor de Produção ------------------------
+
+
+[DEPLOY]
+
+O deploy deve ser realizado após a configuração do servidor de desenvolvimento.
+
+Entrar na pasta current do projeto: cd /opt/nginx/html/osj/current
+Instalar pacotes: bundle install
+
+<!-- 
+Possíveis erros:
+PS: Caso dê erro
+sudo apt-get install libgmp3-dev
+bundle update nio4r
+
+PS.: Caso dê o erro "An error occurred while installing pg (0.20.0), and Bundler cannot continue."
+sudo apt-get install libpq-dev
+gem install pg
+
+PS.: Caso dê erro "An error occurred while installing mysql2 (0.4.6), and Bundler cannot continue."
+sudo apt-get install libmysqlclient-dev
+gem install mysql2 -v '0.4.6'
+
+PS.: Caso dê erro "An error occurred while installing rmagick (2.16.0), and Bundler cannot continue."
+sudo apt-get install libmagick++-dev
+gem install rmagick -v '2.16.0'
+-->
+
+Criar banco de dados: bundle exec rake db:create
+Colocar o rails em produção: export RAILS_ENV=production
+Fazer migrate do banco de dados: rake db:migrate RAILS_ENV=production
+Compilar imagens: bundle exec rake assets:precompile db:migrate RAILS_ENV=production
+
+
+ERROS DE EXECUÇÃO: 
+Se der erro de permissão: 
+sudo chmod o+x "/root"

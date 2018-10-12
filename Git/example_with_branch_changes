@@ -1,0 +1,16 @@
+$ git checkout -b modify-README
+//Switched to a new branch 'modify-README'
+
+$ git branch
+  master
+* modify-README
+//List branchs with selected
+
+$ git add .
+$ git status
+$ git commit -am "change readme"
+//After change files
+
+$ git checkout master
+$ git merge modify-README
+//Back to master and merge
