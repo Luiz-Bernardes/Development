@@ -1,0 +1,51 @@
+npm install -g react-native-cli
+
+> Install JDK
+  $ sudo add-apt-repository ppa:webupd8team/java
+  $ sudo apt update; sudo apt install oracle-java8-installer
+  $ javac -version
+  $ sudo apt install oracle-java8-set-default
+
+> Download and install Android Studio: Options Checked
+  . Android SDK
+  . Android SDK Platform
+  . Android Virtual Device
+
+> Building a React Native app with native code > requires the Android 8.1
+  . Android 8.1 (Oreo)
+    > Check in Android Studio , Preferences → Appearance & Behavior → System Settings → Android SDK
+      . Android SDK Platform 27
+      . Intel x86 Atom_64 System Image or Google APIs Intel x86 Atom System Image
+
+> Next, select the "SDK Tools" tab and check the box next to "Show Package Details" here as well. Look for and expand the "Android SDK Build-Tools" entry.
+  . Then make sure that 27.0.3 is selected
+
+> Configure the ANDROID_HOME environment variable
+  $ nano ~/.bash_profile
+    export ANDROID_HOME=$HOME/Android/Sdk
+    export PATH=$PATH:$ANDROID_HOME/emulator
+    export PATH=$PATH:$ANDROID_HOME/tools
+    export PATH=$PATH:$ANDROID_HOME/tools/bin
+    export PATH=$PATH:$ANDROID_HOME/platform-tools
+
+> Type source to load the config into your current shell
+  source $HOME/.bash_profile
+> Verify that ANDROID_HOME has been added to your path by running
+  echo $PATH
+
+> Generate a new React Native project
+  react-native init FirstProject
+
+> Run android studio
+  $ cd /opt/android-studio/bin
+  $ ./studio.sh
+
+> Run only emulator
+  $ cd Android/Sdk/tools
+  $ emulator -avd Nexus_5X_API_27
+
+> You can see the list of available Android Virtual Devices (AVDs) by opening the "AVD Manager" from within Android Studio. If you have just installed Android Studio, you will likely need to create a new AVD. Select "Create Virtual Device...", then pick any Phone from the list and click "Next", then select the Oreo API Level
+
+> Run android simulator
+  $ cd FirstProject
+  $ react-native run-android
