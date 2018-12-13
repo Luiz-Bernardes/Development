@@ -1,0 +1,4 @@
+ssh(1) -i keyfile -f -N -L 1234:www.google.com:80 host
+
+	ex:
+		ssh -i "file_name.pem" ec2-user@ec2-10-200-20-92.sa-1.amazonaws.com
