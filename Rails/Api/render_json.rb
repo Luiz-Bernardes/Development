@@ -1,14 +1,15 @@
-class UserController < ApplicationController
-  # GET /users
-  # GET /users.json
+class UserController < ApplicationController 
   def index
     @users = User.all
     render json: @users
     # render json: @users, status: :ok
   end
 
-  # GET /users/1
-  # GET /users/1.json
+  # status: :status 
+  # root: boolean
+  # only: [:field ,..]
+  # except: [:field, ..]
+
   def show
     render json: @user
   end
