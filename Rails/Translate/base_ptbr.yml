@@ -1,14 +1,3 @@
-#config/application.rb
-module Project
-  class Application < Rails::Application
-    config.time_zone = 'Brasilia'
-    config.i18n.default_locale = :'pt-BR'
-    # config.active_record.raise_in_transactional_callbacks = true
-  end
-end
-
-
-#config/locales/pt-BR.yml
 pt-BR:
   admin:
     actions:
@@ -242,40 +231,3 @@ pt-BR:
       <<: *errors
 
 
-#config/locales/pt-BR.models.yml
-pt-BR:
-  activerecord:
-    models:
-      sponsorship:
-        one: Patrocínio
-        other: Patrocínios
-      requester:
-        one: Solicitante
-        other: Solicitantes
-
-    attributes:
-      sponsorship:
-        requester_id: Solicitante
-        title_initiative: Título Iniciativa
-        number_participants: Número de Participantes
-        date_initial: Data Inicial
-        date_final: Data Final
-        story: Relato
-        draft: Rascunho
-      requester:
-        kind: Tipo
-        cpf: CPF
-        name: Nome
-        cnpj: CNPJ
-        social_name: Nome Social
-        fantasy_name: Nome Fantasia
-        responsible: Responsável
-
-
-  helpers:
-    actions: Ações
-    links:
-      cancel:  Voltar
-      new:     Novo
-      edit:    Editar
-      destroy: Deletar
