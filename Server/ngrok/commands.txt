@@ -1,0 +1,2 @@
+# Enter in paste with ngrok file and server started
+$ ./ngrok http 3000
